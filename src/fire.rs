@@ -8,7 +8,7 @@ fn main() {
         .run();
 }
 
-const SIZE: f32 = 500.0;
+const SIZE: f32 = 360.0;
 const HALF_SIZE: f32 = SIZE * 0.5;
 const SCL: f32 = 10.0;
 const HALF_SCL: f32 = SCL * 0.5;
@@ -52,7 +52,7 @@ impl Particle {
     }
     fn decay(&mut self, another: u32) {
         if another == 0  { return; }
-        self.intensity = another - 1;
+        self.intensity = another + 1;
     }
 }
 
@@ -64,13 +64,14 @@ fn model(app: &App) -> Model {
     let ids = Ids::new(ui.widget_id_generator());
 
     let mut particles: Vec<Particle> = Vec::new();
-    for i in 0..N as u32 {
-        particles.push(Particle::new(i))
+    for i in 0..N as usize {
+        let intensity = if i < SIZE_SCL as usize { 35 } else { 0 };
+        particles.push(Particle::new(intensity))
     }
-    let frequency = 0.3;
-    let r_phase = 0.0;
-    let g_phase = 2.0;
-    let b_phase = 4.0;
+    let frequency = 0.57;
+    let r_phase = 7.0;
+    let g_phase = 1.5;
+    let b_phase = 8.5;
 
     Model {
         particles,
@@ -84,7 +85,8 @@ fn model(app: &App) -> Model {
 }
 
 fn intensity_to_color(intensity: u32, model: &Model) -> Rgb {
-    let i = deg_to_rad(intensity as f32);
+    let n = 360.0 * (intensity as f32 / 36.0);
+    let i = deg_to_rad(n);
     let r = (i * model.frequency + model.r_phase).sin() * 0.5 + 0.5;
     let g = (i * model.frequency + model.g_phase).sin() * 0.5 + 0.5;
     let b = (i * model.frequency + model.b_phase).sin() * 0.5 + 0.5;
@@ -131,7 +133,22 @@ fn update(_app: &App, model: &mut Model, _update: Update) {
     {
         model.b_phase = value as f32;
     }
+
+    let particles = &mut model.particles;
+
+    for index in 0..N as usize {
+        spread_fire(index, particles);
+    }
+
 }
+
+fn spread_fire(index: usize, particles: &mut Vec<Particle>) {
+    if index < SIZE_SCL as usize { return; }
+    let down_index = index - SIZE_SCL as usize;
+    let down_intensity = particles[down_index].intensity;
+    particles[index].decay(down_intensity);
+}
+
 
 fn view(app: &App, model: &Model, frame: Frame){
     let draw = app.draw();
