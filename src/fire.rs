@@ -50,6 +50,10 @@ impl Particle {
             intensity
         }
     }
+    fn decay(&mut self, another: u32) {
+        if another == 0  { return; }
+        self.intensity = another - 1;
+    }
 }
 
 fn model(app: &App) -> Model {
@@ -61,10 +65,8 @@ fn model(app: &App) -> Model {
 
     let mut particles: Vec<Particle> = Vec::new();
     for i in 0..N as u32 {
-        let intensity = i % 36;
-        particles.push(Particle::new(intensity))
+        particles.push(Particle::new(i))
     }
-
     let frequency = 0.3;
     let r_phase = 0.0;
     let g_phase = 2.0;
@@ -82,7 +84,7 @@ fn model(app: &App) -> Model {
 }
 
 fn intensity_to_color(intensity: u32, model: &Model) -> Rgb {
-    let i = deg_to_rad(360.0 * intensity as f32 / 36.0);
+    let i = deg_to_rad(intensity as f32);
     let r = (i * model.frequency + model.r_phase).sin() * 0.5 + 0.5;
     let g = (i * model.frequency + model.g_phase).sin() * 0.5 + 0.5;
     let b = (i * model.frequency + model.b_phase).sin() * 0.5 + 0.5;
@@ -102,29 +104,29 @@ fn update(_app: &App, model: &mut Model, _update: Update) {
     }
 
     for value in slider(model.frequency as f32, 0.1, 1.0)
-        .down(20.0)
-        .label("Frequency")
+        .top_left_with_margins(10.0, 20.0)
+        .label(&format!("Frequency {}", model.frequency))
         .set(model.ids.frequency, ui)
     {
         model.frequency = value as f32;
     }
     for value in slider(model.r_phase as f32, 0.0, 10.0)
-        .down(30.0)
-        .label("R phase")
+        .top_left_with_margins(40.0, 20.0)
+        .label(&format!("R phase: {}", model.r_phase))
         .set(model.ids.r_phase, ui)
     {
         model.r_phase = value as f32;
     }
     for value in slider(model.g_phase as f32, 0.0, 10.0)
-        .down(40.0)
-        .label("G phase")
+        .top_left_with_margins(70.0, 20.0)
+        .label(&format!("G phase: {}", model.g_phase))
         .set(model.ids.g_phase, ui)
     {
         model.g_phase = value as f32;
     }
     for value in slider(model.b_phase as f32, 0.0, 10.0)
-        .down(50.0)
-        .label("B phase")
+        .top_left_with_margins(100.0, 20.0)
+        .label(&format!("B phase: {}", model.b_phase))
         .set(model.ids.b_phase, ui)
     {
         model.b_phase = value as f32;
@@ -134,10 +136,11 @@ fn update(_app: &App, model: &mut Model, _update: Update) {
 fn view(app: &App, model: &Model, frame: Frame){
     let draw = app.draw();
     draw.background().color(BLACK);
-    //for (idx, particle) in model.particles.iter().enumerate() {
-    //    let (x, y) = idx_to_x_y(idx);
-    //    draw.rect().x_y(x, y).w_h(SCL, SCL).color(intensity_to_color(particle.intensity, model));
-    //}
+    for (idx, particle) in model.particles.iter().enumerate() {
+        let (x, y) = idx_to_x_y(idx);
+        //println!("{} {} {}", x, y, particle.intensity);
+        draw.rect().x_y(x, y).w_h(SCL, SCL).color(intensity_to_color(particle.intensity, model));
+    }
     draw.to_frame(app, &frame).unwrap();
     model.ui.draw_to_frame(app, &frame).unwrap();
 }
