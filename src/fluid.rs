@@ -57,18 +57,23 @@ impl Fluid {
         let dt = self.dt;
         let visc = self.visc;
         let diff = self.diff;
-        let vx0 = &mut self.vx0;
         let vx = &mut self.vx;
-        let vy0 = &mut self.vy0;
+        let vx0 = &mut self.vx0;
         let vy = &mut self.vy;
+        let vy0 = &mut self.vy0;
         let s = &mut self.s;
         let density = &mut self.density;
+
         diffuse(1, vx0, vx, visc, dt);
         diffuse(2, vy0, vy, visc, dt);
+
         project(vx0, vy0, vx, vy);
+
         advect(1, vx, vx0, vx0, vy0, dt);
         advect(2, vy, vy0, vx0, vy0, dt);
-        project(vx0, vy0, vx, vy);
+
+        project(vx, vy, vx0, vy0);
+
         diffuse(0, s, density, diff, dt);
         advect(0, density, s, vx, vy, dt);
     }
@@ -76,20 +81,34 @@ impl Fluid {
     fn decay(&mut self) {
         let density = &mut self.density;
         for i in 0..N {
-            density[i] = if density[i] > 0.0 { density[i] - 0.5 } else { 0.0 };
+            let delta = density[i] - 50.0;
+            density[i] = if delta < 0.0 { 0.0 } else { delta };
         }
     }
 }
 
 fn x_y_to_index(x: usize, y: usize) -> usize {
-    x + y * N
+    let xc = clamp(x, 0, N -1);
+    let yc = clamp(y, 0, N -1);
+    xc + yc * N
 }
 
-fn diffuse(b: usize, x: &mut Vec<f32>, x0: &mut Vec<f32>, diff: f32, dt: f32) {
-    let n_minus_2 = (N - 2) as f32;
-    let a = dt * diff * n_minus_2 * n_minus_2;
-    linear_solve(b, x, x0, a, 1.0 + 6.0 * a)
+fn set_bnd(b: usize, x: &mut Vec<f32>) {
+    for i in 1..N-1 {
+        x[x_y_to_index(i, 0)] = x[x_y_to_index(i, 1)] * (if b == 2 { -1.0 } else { 1.0 });
+        x[x_y_to_index(i, N-1)] = x[x_y_to_index(i, N-2)] * (if b == 2 { -1.0 } else { 1.0 });
+    }
+    for j in 1..N-1 {
+        x[x_y_to_index(0, j)] = x[x_y_to_index(1, j)] * (if b == 1 { -1.0 } else { 1.0 });
+        x[x_y_to_index(N-1, j)] = x[x_y_to_index(N-2, j)] * (if b == 1 { -1.0 } else { 1.0 });
+    }
+    x[x_y_to_index(0, 0)] = 0.33 * (x[x_y_to_index(1, 0)] + x[x_y_to_index(0, 1)]);
+    x[x_y_to_index(0, N-1)] = 0.33 * (x[x_y_to_index(1, N-1)] + x[x_y_to_index(0, N-2)]);
+    x[x_y_to_index(N-1, 0)] = 0.33 * (x[x_y_to_index(N-2, 0)] + x[x_y_to_index(N-1, 1)]);
+    x[x_y_to_index(N-1, N-1)] = 0.33 * (x[x_y_to_index(N-2, N-1)] + x[x_y_to_index(N-1, N-2)]);
+
 }
+
 
 fn linear_solve(b: usize, x: &mut Vec<f32>, x0: &mut Vec<f32>, a: f32, c: f32) {
     let c_recip = 1.0 / c;
@@ -97,16 +116,22 @@ fn linear_solve(b: usize, x: &mut Vec<f32>, x0: &mut Vec<f32>, a: f32, c: f32) {
         for j in 1..N-1 {
             for i in 1..N-1 {
                 let index = x_y_to_index(i, j);
-                x[index] = x0[index] + a * (
+                x[index] = (x0[index] + a * (
                     x[x_y_to_index(i + 1, j)] +
                     x[x_y_to_index(i - 1, j)] +
                     x[x_y_to_index(i, j + 1)] +
                     x[x_y_to_index(i, j - 1)]
-                ) * c_recip;
+                )) * c_recip;
             }
         }
         set_bnd(b, x);
     }
+}
+
+fn diffuse(b: usize, x: &mut Vec<f32>, x0: &mut Vec<f32>, diff: f32, dt: f32) {
+    let n_minus_2 = (N - 2) as f32;
+    let a = dt * diff * n_minus_2 * n_minus_2;
+    linear_solve(b, x, x0, a, 1.0 + 6.0 * a);
 }
 
 fn project(vx: &mut Vec<f32>, vy: &mut Vec<f32>, p: &mut Vec<f32>, div: &mut Vec<f32>) {
@@ -126,8 +151,8 @@ fn project(vx: &mut Vec<f32>, vy: &mut Vec<f32>, p: &mut Vec<f32>, div: &mut Vec
     linear_solve(0, p, div, 1.0, 6.0);
     for j in 1..N-1 {
         for i in 1..N-1 {
-            vx[x_y_to_index(i, j)] = -0.5 * (p[x_y_to_index(i + 1, j)] - p[x_y_to_index(i - 1, j)]) * N as f32;
-            vy[x_y_to_index(i, j)] = -0.5 * (p[x_y_to_index(i, j + 1)] - p[x_y_to_index(i, j + 1)]) * N as f32;
+            vx[x_y_to_index(i, j)] -= 0.5 * (p[x_y_to_index(i + 1, j)] - p[x_y_to_index(i - 1, j)]) * N as f32;
+            vy[x_y_to_index(i, j)] -= 0.5 * (p[x_y_to_index(i, j + 1)] - p[x_y_to_index(i, j - 1)]) * N as f32;
         }
     }
     set_bnd(1, vx);
@@ -180,23 +205,6 @@ fn advect(b: usize, d: &mut Vec<f32>, d0: & Vec<f32>, vx: & Vec<f32>, vy: & Vec<
     set_bnd(b, d);
 }
 
-fn set_bnd(b: usize, x: &mut Vec<f32>) {
-    for i in 1..N - 1 {
-        x[x_y_to_index(i, 0)] = x[x_y_to_index(i, 1)] * (if b == 2 { -1.0 } else { 1.0 });
-        x[x_y_to_index(i, N-1)] = x[x_y_to_index(i, N-2)] * (if b == 2 { -1.0 } else { 1.0 });
-    }
-    for j in 1..N - 1 {
-        x[x_y_to_index(0, j)] = x[x_y_to_index(1, j)] * (if b == 1 { -1.0 } else { 1.0 });
-        x[x_y_to_index(N-1, j)] = x[x_y_to_index(N-2, j)] * (if b == 1 { -1.0 } else { 1.0 });
-    }
-
-    x[x_y_to_index(0, 0)] = 0.5 * (x[x_y_to_index(1, 0)] + x[x_y_to_index(0, 1)]);
-    x[x_y_to_index(0, N-1)] = 0.5 * (x[x_y_to_index(1, N-1)] + x[x_y_to_index(0, N-2)]);
-    x[x_y_to_index(N-1, 0)] = 0.5 * (x[x_y_to_index(N-2, 0)] + x[x_y_to_index(N-1, 1)]);
-    x[x_y_to_index(N-1, N-1)] = 0.5 * (x[x_y_to_index(N-2, N-1)] + x[x_y_to_index(N-1, N-2)]);
-
-}
-
 struct Model {
     fluid: Fluid
 }
@@ -212,7 +220,7 @@ fn model(app: &App) -> Model {
         .unwrap();
 
     Model {
-        fluid: Fluid::new(0.5, 0.0, 0.1)
+        fluid: Fluid::new(0.1, 0.0, 0.0)
     }
 }
 
@@ -220,10 +228,9 @@ fn mouse_moved(app: &App, model: &mut Model, _dir: Vector2<f32>) {
     if app.mouse.buttons.left().is_down() {
         let x = HALF_N + app.mouse.x / SCL;
         let y = HALF_N + app.mouse.y / SCL;
-        println!("{} {}", x as usize, y as usize);
         let fluid = &mut model.fluid;
-        fluid.add_density(x as usize, y as usize, 1.0);
-        fluid.add_velocity(x as usize, y as usize, 10.0, 10.0);
+        fluid.add_density(x as usize, y as usize, random::<f32>() * 100.0);
+        fluid.add_velocity(x as usize, y as usize, (random::<f32>() - 0.5) * 10.0, (random::<f32>() - 0.5) * 10.0);
     }
 }
 
