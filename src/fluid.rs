@@ -12,9 +12,10 @@ const HALF_N: f32 = N as f32 * 0.5;
 const NN: usize = N * N;
 const N_FLOAT: f32 = N as f32;
 const ITER: usize = 4;
-const SCL: f32 = 10.0;
+const SCL: f32 = 5.0;
 const N_SCL: f32 = N as f32 * SCL;
 const HALF_N_SCL: f32 = N_SCL * 0.5;
+const HALF_SCL: f32 = SCL * 0.5;
 
 struct Fluid {
     dt: f32,
@@ -82,7 +83,7 @@ impl Fluid {
         let density = &mut self.density;
         for i in 0..N {
             let delta = density[i] - 50.0;
-            density[i] = if delta < 0.0 { 0.0 } else { delta };
+            density[i] = clamp(delta, 0.0, 100.0)
         }
     }
 }
@@ -215,14 +216,24 @@ fn model(app: &App) -> Model {
         .new_window()
         .size(s as u32, s as u32)
         .view(view)
+        .mouse_pressed(mouse_pressed)
         .mouse_moved(mouse_moved)
         .build()
         .unwrap();
 
     Model {
-        fluid: Fluid::new(0.1, 0.0, 0.0)
+        fluid: Fluid::new(0.1, 0.000001, 0.000001)
     }
 }
+
+fn mouse_pressed(app: &App, model: &mut Model, _button: MouseButton) {
+    let x = HALF_N + app.mouse.x / SCL;
+    let y = HALF_N + app.mouse.y / SCL;
+    let fluid = &mut model.fluid;
+    fluid.add_density(x as usize, y as usize, 0.0);
+    fluid.add_velocity(x as usize, y as usize, (random::<f32>() - 0.5) * 100.0, (random::<f32>() - 0.5) * 100.0);
+}
+
 
 fn mouse_moved(app: &App, model: &mut Model, _dir: Vector2<f32>) {
     if app.mouse.buttons.left().is_down() {
@@ -232,12 +243,23 @@ fn mouse_moved(app: &App, model: &mut Model, _dir: Vector2<f32>) {
         fluid.add_density(x as usize, y as usize, random::<f32>() * 100.0);
         fluid.add_velocity(x as usize, y as usize, (random::<f32>() - 0.5) * 10.0, (random::<f32>() - 0.5) * 10.0);
     }
+    if app.mouse.buttons.right().is_down() {
+        let fluid = &mut model.fluid;
+        for i in 0..N {
+            fluid.s[i] = 0.0;
+            fluid.density[i] = 0.0;
+            fluid.vx[i] = 0.0;
+            fluid.vy[i] = 0.0;
+            fluid.vx0[i] = 0.0;
+            fluid.vy0[i] = 0.0;
+        }
+    }
 }
 
 fn update(_app: &App, model: &mut Model, _update: Update) {
     let fluid = &mut model.fluid;
-    fluid.step();
     fluid.decay();
+    fluid.step();
 }
 
 fn view(app: &App, model: &Model, frame: Frame){
@@ -248,9 +270,9 @@ fn view(app: &App, model: &Model, frame: Frame){
         for i in 0..N {
             let index = x_y_to_index(i, j);
             let density = fluid.density[index];
-            let x = i as f32 * SCL - HALF_N_SCL;
-            let y = j as f32 * SCL - HALF_N_SCL;
-            draw.rect().x_y(x, y).w(SCL).h(SCL).color(srgba(1.0, 1.0, 1.0, density));
+            let x = i as f32 * SCL - HALF_N_SCL + HALF_SCL;
+            let y = j as f32 * SCL - HALF_N_SCL + HALF_SCL;
+            draw.rect().x_y(x, y).w(SCL).h(SCL).color(srgba(1.0, 1.0, 1.0, density / 100.0));
         }
     }
     draw.to_frame(app, &frame).unwrap()
