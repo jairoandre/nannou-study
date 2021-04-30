@@ -16,3 +16,7 @@ path = "src/fire.rs"
 [[example]]
 name = "fluid"
 path = "src/fluid.rs"
+
+[[example]]
+name = "slime"
+path = "src/slime.rs"
