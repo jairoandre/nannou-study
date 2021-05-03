@@ -20,3 +20,7 @@ path = "src/fluid.rs"
 [[example]]
 name = "slime"
 path = "src/slime.rs"
+
+[[example]]
+name = "ants"
+path = "src/ants/ants.rs"
