@@ -1,0 +1,230 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'doom-fire'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=doom-fire",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "doom-fire",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'doom-fire'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=doom-fire",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "doom-fire",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'fire'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=fire",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "fire",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'fire'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=fire",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "fire",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'fluid'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=fluid",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "fluid",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'fluid'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=fluid",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "fluid",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'slime'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=slime",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "slime",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'slime'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=slime",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "slime",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'ants'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=ants",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "ants",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'ants'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=ants",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "ants",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'csb'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=csb",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "csb",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'csb'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=csb",
+          "--package=doom-fire"
+        ],
+        "filter": {
+          "name": "csb",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

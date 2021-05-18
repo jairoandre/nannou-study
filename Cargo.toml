@@ -24,3 +24,7 @@ path = "src/slime.rs"
 [[example]]
 name = "ants"
 path = "src/ants/ants.rs"
+
+[[example]]
+name = "csb"
+path = "src/csb/main.rs"
