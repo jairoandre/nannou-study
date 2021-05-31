@@ -28,3 +28,11 @@ path = "src/ants/ants.rs"
 [[example]]
 name = "csb"
 path = "src/csb/main.rs"
+
+[[example]]
+name = "exo"
+path = "src/exo/main.rs"
+
+[[example]]
+name = "sin"
+path = "src/sin/main.rs"
