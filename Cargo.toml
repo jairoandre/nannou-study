@@ -36,3 +36,7 @@ path = "src/exo/main.rs"
 [[example]]
 name = "sin"
 path = "src/sin/main.rs"
+
+[[example]]
+name = "collatz"
+path = "src/collatz/main.rs"
