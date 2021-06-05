@@ -40,3 +40,19 @@ path = "src/sin/main.rs"
 [[example]]
 name = "collatz"
 path = "src/collatz/main.rs"
+
+[[example]]
+name = "worley"
+path = "src/worley/main.rs"
+
+[[example]]
+name = "schotter"
+path = "src/schotter/main.rs"
+
+[[example]]
+name = "circles"
+path = "src/circles/main.rs"
+
+[[example]]
+name = "auto"
+path = "src/auto/main.rs"

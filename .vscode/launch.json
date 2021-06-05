@@ -4,6 +4,8 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
+  
     {
       "type": "lldb",
       "request": "launch",
@@ -192,15 +194,15 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug example 'csb'",
+      "name": "Debug example 'worley'",
       "cargo": {
         "args": [
           "build",
-          "--example=csb",
+          "--example=worley",
           "--package=doom-fire"
         ],
         "filter": {
-          "name": "csb",
+          "name": "worley",
           "kind": "example"
         }
       },
@@ -210,16 +212,16 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in example 'csb'",
+      "name": "Debug unit tests in example 'worley'",
       "cargo": {
         "args": [
           "test",
           "--no-run",
-          "--example=csb",
+          "--example=worley",
           "--package=doom-fire"
         ],
         "filter": {
-          "name": "csb",
+          "name": "worley",
           "kind": "example"
         }
       },

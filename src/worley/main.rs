@@ -47,6 +47,10 @@ struct Model {
 }
 
 const S: i32 = 800;
+const H_S: i32 = S / 2;
+const SCL: i32 = 10;
+const H_SCL: i32 = SCL / 2;
+const S_SCL: i32 = S / SCL;
 
 fn model(app: &App) -> Model {
     let _window = app
@@ -74,4 +78,5 @@ fn view(app: &App, model: &Model, frame: Frame){
         thing.draw(&draw);
     }
     draw.to_frame(app, &frame).unwrap();
+    //app.set_loop_mode(LoopMode::loop_once());
 }
